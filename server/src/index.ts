@@ -4,6 +4,7 @@ import { initPassport } from './passport';
 import { initServices } from './services/services';
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import { securityMiddleware } from './security';
 
 const app = express();
 const router = express.Router();
@@ -20,6 +21,9 @@ app.use(bodyParser.json());
 
 // Init passport
 initPassport(app);
+
+// Init security
+app.use(securityMiddleware);
 
 // Init service
 initServices(router);

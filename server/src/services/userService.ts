@@ -45,8 +45,7 @@ const register = (req, res) => {
             username: req.body.username,
             password: req.body.password
         });
-        console.log(userModel);
-        console.log(user);
+
         user.save((error) => {
             if (error) {
                 if (error.code === 11000) {

@@ -1,8 +1,9 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
 
-import { AppComponent } from './app.component';
-import { GardenComponent } from './garden/garden.component';
+import {AppComponent} from './app.component';
+import {GardenComponent} from './garden/garden.component';
+import {GardenService} from './garden/garden.service';
 
 @NgModule({
   declarations: [
@@ -12,7 +13,8 @@ import { GardenComponent } from './garden/garden.component';
   imports: [
     BrowserModule
   ],
-  providers: [],
+  providers: [GardenService],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

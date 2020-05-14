@@ -23,5 +23,9 @@ export const securityMiddleware = (req, res, next) => {
 }
 
 export const getSessionUserID = (req) => {
+    if (req == null || req.session == null || req.session.passport == null || req.session.passport.user == null) {
+        return null;
+    }
+
     return req.session.passport.user._id;
 }

@@ -11,6 +11,10 @@ import {GardenService} from './garden.service';
 export class GardenComponent implements OnInit {
 
   garden: Garden[] = [];
+  display = false;
+  clickedIndex;
+  clickedBackground;
+  clickedVegetable;
 
   @ViewChild('canvas', {static: true})
   canvas: ElementRef<HTMLCanvasElement>;
@@ -32,6 +36,10 @@ export class GardenComponent implements OnInit {
     const left = event.pageX - elem.offsetLeft + elem.clientLeft;
     const top = event.pageY - elem.offsetTop + elem.clientTop;
     const field = _.find(this.garden, f => f.x === left - (left % 100) && f.y === top - (top % 100));
+    this.clickedIndex = field.index;
+    this.clickedBackground = field.background;
+    this.clickedVegetable = field.vegetable;
+    this.display = true;
     console.log(field);
   }
 

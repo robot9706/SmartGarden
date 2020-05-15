@@ -1,4 +1,23 @@
 <div class="container">
   <canvas #canvas id="canvas" width="500" height="500" (click)="onClickCanvas($event)" style="align: center"></canvas>
 </div>
+<div>
+  <p-dialog class="dialogClass"
+            id="fieldDialog"
+            #fieldDialog
+            [(visible)]="display"
+            [header]="'Szegmens módosítása'"
+            [showHeader]="true"
+            [closable]="true"
+            [modal]="true"
+            [appendTo]="'body'"
+            [baseZIndex]="10000"
+            [draggable]="false">
+    <span>{{clickedBackground}}</span>
+    <span>{{clickedVegetable}}</span>
+    <p-footer>
+      <button type="button" pButton icon="pi pi-check" label="Mentés"></button>
+    </p-footer>
+  </p-dialog>
+</div>
 

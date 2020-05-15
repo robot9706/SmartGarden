@@ -1,0 +1,9 @@
+<div>
+  <p>username</p>
+  <input type="text" [(ngModel)]="username">
+</div>
+<div>
+  <p>password</p>
+  <input type="password" [(ngModel)]="password">
+</div>
+<button [routerLink]="['/garden']" (click)="onClickLogin()">Bejelentkezés</button>

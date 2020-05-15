@@ -1,11 +1,40 @@
 import passport from "passport";
 import mongoose from "mongoose";
 import { addSecurity, getSessionUserID } from "../security";
-import { gardenModel } from "../model/model";
+import { gardenModel, gardenerModel } from "../model/model";
 import { CELL_COUNT } from "../model/garden";
 import { EMPTY_CELL } from "../model/garden";
+import { handleError } from "./services";
 
-const ACTION_CHANGE_PLANT = "ACTION_CHANGE_PLANT";
+const ACTION_REQUEST_PLANT_CHANGE = "ACTION_REQUEST_PLANT_CHANGE";
+const ACTION_CONFIRM_PLANT_CHANGE = "ACTION_CONFIRM_PLANT_CHANGE";
+
+const isOwner = (gardenID, userID) => {
+    return new Promise((resolve, reject) => {
+        gardenModel.find({
+            owner: userID,
+            _id: gardenID
+        }, (err, result) => {
+            if (err) reject(err);
+            else if (result != null && result.length == 1) {
+                resolve(1);
+            } else {
+                gardenerModel.find({
+                    garden: gardenID,
+                    gardener: userID
+                }, (err, result) => {
+                    if (err) reject(err);
+                    else if (result != null && result.length == 1) {
+                        resolve(0);
+                    }
+                    else {
+                        resolve(null);
+                    }
+                })
+            }
+        })
+    });
+}
 
 const create = (req, res) => {
     const data = req.body;
@@ -30,14 +59,7 @@ const create = (req, res) => {
     });
 
     newGarden.save((error) => {
-        if (error) {
-            console.log(error);
-
-            res.status(500).send({
-                ok: false,
-                error: error.toString()
-            });
-        } else {
+        if (!handleError(error, res)) {
             res.status(200).send({
                 ok: true,
                 error: null
@@ -51,20 +73,35 @@ const get_all = (req, res) => {
 
     gardenModel.find({
         owner: uid
-    }, (err, data) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send({
-                ok: false,
-                error: err.toString()
-            })
-        } else {
-            res.status(200).send({
-                ok: true,
-                gardens: data
+    }, (err, ownGardens) => {
+        console.log(ownGardens);
+        if (!handleError(err, res)) {
+            console.log(uid);
+            gardenerModel.find({
+                gardener: uid
+            }, (err, gardening) => {
+                if (!handleError(err, res)) {
+                    const filtered = gardening.map(x => x.garden);
+                    
+                    gardenModel.find({
+                        _id: {
+                            $in: filtered
+                        }
+                    }, (err, notOwnGardens) => {
+                        if (!handleError(err, res)) {
+                            res.send({
+                                ok: true,
+                                data: {
+                                    own: ownGardens,
+                                    other: notOwnGardens
+                                }
+                            })
+                        }
+                    })
+                }
             })
         }
-    });
+    })
 };
 
 const get_info = (req, res) => {
@@ -78,16 +115,25 @@ const get_info = (req, res) => {
     const uid = getSessionUserID(req);
     const gid = req.query.garden_id;
 
-    res.send({
-        ok: true,
-        data: {
-            temperature: 20,
-            humidity: 50
+    gardenerModel.find({
+        garden: gid
+    }, (err, data) => {
+        if (!handleError(err, res)) {
+            const gardeners = data.map(x => x.gardener);
+
+            res.send({
+                ok: true,
+                data: {
+                    gardeners: gardeners,
+                    temperature: 20,
+                    humidity: 50
+                }
+            });
         }
-    });
+    })
 }
 
-const cell_info = (req, res) => {
+const cell_info = async (req, res) => {
     if (req.query.garden_id == null || req.query.cell_index == null) {
         return res.send({
             ok: false,
@@ -106,23 +152,24 @@ const cell_info = (req, res) => {
         });
     }
 
+    const ownType = await isOwner(gid, uid);
+    if (ownType == null) {
+        return res.send({
+            ok: false,
+            error: "No permission"
+        });
+    }
+
     gardenModel.findOne({
-        _id: gid,
-        owner: uid
+        _id: gid
     }, (err, data) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send({
-                ok: false,
-                error: err.toString()
-            })
-        } else {
+        if (!handleError(err, res)) {
             res.status(200).send({
                 ok: true,
                 data: {
                     cell: data.cells[cid],
                     actions: [
-                        ACTION_CHANGE_PLANT
+                        (ownType == 1 ? ACTION_REQUEST_PLANT_CHANGE : ACTION_CONFIRM_PLANT_CHANGE)
                     ]
                 }
             })
@@ -131,15 +178,19 @@ const cell_info = (req, res) => {
 }
 
 const cell_actions = {
-    ACTION_CHANGE_PLANT: (garden, cell_index, action_data) => {
-        return new Promise((resolve, reject) => {
+    ACTION_REQUEST_PLANT_CHANGE: (garden, userID, ownType, cell_index, action_data) => {
+        return new Promise(async (resolve, reject) => {
             if (action_data.new_plant == null) {
-                return { ok: false, error: "Missing plant!" };
+                return resolve ({ ok: false, error: "Missing plant!" });
             }
-    
-            garden.cells[cell_index].content = action_data.new_plant;
-            garden.markModified("cells");
 
+            if (ownType !== 1) { //Owner
+                return resolve ({ ok: false, error: "Invalid action!" });
+            }
+
+            garden.cells[cell_index].content_requested = action_data.new_plant;
+            garden.markModified("cells");
+    
             garden.save((err) => {
                 if (err) {
                     resolve({
@@ -153,11 +204,39 @@ const cell_actions = {
                     })
                 }
             })
-        });
+        })
+    },
+    ACTION_CONFIRM_PLANT_CHANGE: (garden, userID, ownType, cell_index, action_data) => {
+        return new Promise(async (resolve, reject) => {
+            if (ownType !== 0) { //Gardener
+                return resolve ({ ok: false, error: "Invalid action!" });
+            }
+
+            if (garden.cells[cell_index].content_requested == null) {
+                return resolve ({ ok: false, error: "No change requested!" }); 
+            }
+
+            garden.cells[cell_index].content = action_data.content_requested;
+            garden.markModified("cells");
+    
+            garden.save((err) => {
+                if (err) {
+                    resolve({
+                        ok: false,
+                        error: err.toString()
+                    });
+                } else {
+                    resolve({
+                        ok: true,
+                        error: null
+                    })
+                }
+            })
+        })
     }
 }
 
-const cell_action = (req, res) => {
+const cell_action = async (req, res) => {
     const data = req.body;
     const { garden_id, cell_index, action, action_data } = data;
 
@@ -183,19 +262,19 @@ const cell_action = (req, res) => {
     }
 
     const uid = getSessionUserID(req);
+    const ownType = await isOwner(garden_id, uid);
+    if (ownType == null) {
+        return res.send({
+            ok: false,
+            error: "Invalid garden!"
+        })
+    }
 
     gardenModel.findOne({
-        _id: garden_id,
-        owner: uid
+        _id: garden_id
     }, async (err, data) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send({
-                ok: false,
-                error: err.toString()
-            })
-        } else {
-            const { ok, error } = await cell_actions[action](data, cell_index, action_data);
+        if (!handleError(err, res)) {
+            const { ok, error } = await cell_actions[action](data, uid, ownType, cell_index, action_data);
             res.status(200).send({
                 ok: ok,
                 error: error

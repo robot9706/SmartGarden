@@ -55,7 +55,9 @@ const create = (req, res) => {
     const newGarden = new gardenModel({
         name: name,
         owner: uid,
-        cells: empty_cells
+        cells: empty_cells,
+        heating: 0,
+        watering: 0
     });
 
     newGarden.save((error) => {
@@ -115,20 +117,28 @@ const get_info = (req, res) => {
     const uid = getSessionUserID(req);
     const gid = req.query.garden_id;
 
-    gardenerModel.find({
-        garden: gid
-    }, (err, data) => {
+    gardenModel.findOne({
+        _id: gid
+    }, (err, garden) =>{
         if (!handleError(err, res)) {
-            const gardeners = data.map(x => x.gardener);
-
-            res.send({
-                ok: true,
-                data: {
-                    gardeners: gardeners,
-                    temperature: 20,
-                    humidity: 50
+            gardenerModel.find({
+                garden: gid
+            }, (err, data) => {
+                if (!handleError(err, res)) {
+                    const gardeners = data.map(x => x.gardener);
+        
+                    res.send({
+                        ok: true,
+                        data: {
+                            gardeners: gardeners,
+                            temperature: 20,
+                            humidity: 50,
+                            heating: garden.heating,
+                            watering: garden.watering
+                        }
+                    });
                 }
-            });
+            })
         }
     })
 }
@@ -283,6 +293,49 @@ const cell_action = async (req, res) => {
     });
 }
 
+const garden_control = async (req, res) => {
+    if (req.body.garden == null || (req.body.heating == null && req.body.watering == null)) {
+        return res.send({
+            ok: false,
+            error: "Mising parameters!"
+        });
+    }
+
+    const uid = getSessionUserID(req);
+    const ownType = await isOwner(req.body.garden, uid);
+    if (ownType !== 1) {
+        return res.send({
+            ok: false,
+            error: "Invalid garden!"
+        })
+    }
+
+    gardenModel.findOne({
+        _id: req.body.garden
+    }, (err, garden) => {
+        if (!handleError(err, res)) {
+            if (req.body.heating != null) {
+                garden.heating = req.body.heating;
+                garden.markModified("heating");
+            }
+    
+            if (req.body.watering != null) {
+                garden.watering = req.body.watering;
+                garden.markModified("watering");
+            }
+            
+            garden.save((err) => {
+                if (!handleError(err, res)) {
+                    return res.send({
+                        ok: true,
+                        error: null
+                    })
+                }
+            })
+        }
+    });
+}
+
 export const initGardenService = (router) => {
     router.route("/garden_create").post(create);
     addSecurity("/garden_create");
@@ -298,4 +351,7 @@ export const initGardenService = (router) => {
 
     router.route("/garden_cell_action").post(cell_action);
     addSecurity("/garden_cell_action");
+
+    router.route("/garden_control").post(garden_control);
+    addSecurity("/garden_control");
 }

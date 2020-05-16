@@ -8,5 +8,7 @@ export const EMPTY_CELL = "EMPTY";
 export const gardenSchema = new mongoose.Schema({
     owner: { type: mongoose.Types.ObjectId, required: true },
     name: { type: String, required: true, unique: true },
-    cells: { type: Array, required: true, default: [ ] }
+    cells: { type: Array, required: true, default: [ ] },
+    heating: { type: Number, required: true, default: 0 },
+    watering: { type: Number, required: true, default: 0 },
 });

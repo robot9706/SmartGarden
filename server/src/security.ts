@@ -1,3 +1,5 @@
+import url from "url";
+
 let securityUrls = [];
 
 export const addSecurity = (data: String | String[]) => {
@@ -11,7 +13,8 @@ export const addSecurity = (data: String | String[]) => {
 }
 
 export const securityMiddleware = (req, res, next) => {
-    if (!req.isAuthenticated() && securityUrls.includes(req.url)) {
+    const baseUrl = url.parse(req.url).pathname;
+    if (!req.isAuthenticated() && securityUrls.includes(baseUrl)) {
         res.status(403).send({
             ok: false,
             error: "Not logged in!"

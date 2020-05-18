@@ -4,14 +4,13 @@ import {Router} from '@angular/router';
 import {DataService} from '../services/data.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  selector: 'app-menu',
+  templateUrl: './menu.component.html',
+  styleUrls: ['./menu.component.css']
 })
-export class LoginComponent implements OnInit {
+export class MenuComponent implements OnInit {
 
-  username: string;
-  password: string;
+  user: boolean;
 
   constructor(private loginService: LoginService,
               private router: Router,
@@ -19,20 +18,21 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    localStorage.clear();
+    this.user = !!localStorage.getItem('username');
+    this.data.currentMessage.subscribe(message => this.user = message);
   }
 
-  onClickLogin() {
-    this.loginService.login(this.username, this.password).subscribe(
+  logout() {
+    this.loginService.logout().subscribe(
       data => {
+        localStorage.clear();
         console.log(data);
-        localStorage.setItem('username', this.username);
-        this.router.navigate(['/garden']);
-        this.data.changeMessage(true);
+        this.router.navigate(['/login']);
+        this.user = false;
       },
       error => {
         console.log(error);
-      });
+      }
+    );
   }
-
 }

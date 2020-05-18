@@ -15,7 +15,19 @@ app.get('/', (req, res) => {
     res.send("Hello");
 });
 
-app.use(cors());
+var whitelist = ['http://localhost:4200']
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true
+}
+
+app.use(cors(corsOptions));
 
 // Init middlewares
 app.use(cookieParser());

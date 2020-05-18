@@ -4,7 +4,7 @@ import {NgModule} from '@angular/core';
 import {AppComponent} from './app.component';
 import {GardenComponent} from './garden/garden.component';
 import {GardenService} from './garden/garden.service';
-import {ButtonModule, CalendarModule, DialogModule} from 'primeng';
+import {ButtonModule, CalendarModule, DialogModule, MenubarModule, MenuModule} from 'primeng';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AppRoutingModule} from './app-routing.module';
 import {RouterModule} from '@angular/router';
@@ -13,6 +13,7 @@ import {ErrorComponent} from './error/error.component';
 import {RegistrationComponent} from './registration/registration.component';
 import {FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
+import {MenuComponent} from './menu/menu.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import {HttpClientModule} from '@angular/common/http';
     GardenComponent,
     LoginComponent,
     ErrorComponent,
-    RegistrationComponent
+    RegistrationComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,
@@ -31,9 +33,11 @@ import {HttpClientModule} from '@angular/common/http';
     AppRoutingModule,
     RouterModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    MenuModule,
+    MenubarModule
   ],
-  providers: [GardenService],
+  providers: [GardenService, MenuComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {

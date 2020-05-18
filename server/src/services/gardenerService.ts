@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { addSecurity, getSessionUserID } from "../security";
 import { gardenModel, gardenerModel } from "../model/model";
 import { handleError } from "./services";
+import { logData } from "./logService";
 
 const gardenerAdd = (req, res) => {
     const data = req.body;
@@ -47,6 +48,9 @@ const gardenerAdd = (req, res) => {
                                     error: error.toString()
                                 })
                             } else {
+
+                                logData(garden, uid, gardener, "GARDENER_ADDED");
+                                
                                 return res.send({
                                     ok: true,
                                     error: null
@@ -83,6 +87,9 @@ const gardenerRemove = (req, res) => {
         gardener: gardener
     }, (err) => {
         if (!handleError(err, res)) {
+
+            logData(garden, uid, gardener, "GARDENER_REMOVED");
+
             return res.send({
                 ok: true,
                 error: null

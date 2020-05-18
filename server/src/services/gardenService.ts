@@ -5,6 +5,7 @@ import { gardenModel, gardenerModel } from "../model/model";
 import { CELL_COUNT } from "../model/garden";
 import { EMPTY_CELL } from "../model/garden";
 import { handleError } from "./services";
+import { logData } from "./logService";
 
 const ACTION_REQUEST_PLANT_CHANGE = "ACTION_REQUEST_PLANT_CHANGE";
 const ACTION_CONFIRM_PLANT_CHANGE = "ACTION_CONFIRM_PLANT_CHANGE";
@@ -60,8 +61,10 @@ const create = (req, res) => {
         watering: 0
     });
 
-    newGarden.save((error) => {
+    newGarden.save((error, data) => {
         if (!handleError(error, res)) {
+            logData(data._id, uid, null, "GARDEN_CREATE");
+
             res.status(200).send({
                 ok: true,
                 error: null
@@ -208,6 +211,8 @@ const cell_actions = {
                         error: err.toString()
                     });
                 } else {
+                    logData(garden, userID, null, `CELL|ACTION_REQUEST_PLANT_CHANGE|${cell_index}|${action_data.new_plant}`);
+
                     resolve({
                         ok: true,
                         error: null
@@ -236,6 +241,8 @@ const cell_actions = {
                         error: err.toString()
                     });
                 } else {
+                    logData(garden, userID, null, `CELL|ACTION_CONFIRM_PLANT_CHANGE|${cell_index}|${action_data.content_requested}`);
+
                     resolve({
                         ok: true,
                         error: null
@@ -303,7 +310,7 @@ const garden_control = async (req, res) => {
 
     const uid = getSessionUserID(req);
     const ownType = await isOwner(req.body.garden, uid);
-    if (ownType !== 1) {
+    if (ownType == null) {
         return res.send({
             ok: false,
             error: "Invalid garden!"
@@ -314,18 +321,34 @@ const garden_control = async (req, res) => {
         _id: req.body.garden
     }, (err, garden) => {
         if (!handleError(err, res)) {
+            let logText: any[] = [];
+
             if (req.body.heating != null) {
                 garden.heating = req.body.heating;
                 garden.markModified("heating");
+
+                if (garden.heating == 1) {
+                    logText.push("HEATING");
+                } else if (garden.heating == -1) {
+                    logText.push("COOLING");
+                }
             }
     
             if (req.body.watering != null) {
                 garden.watering = req.body.watering;
                 garden.markModified("watering");
+
+                if (garden.watering == 1) {
+                    logText.push("WATERING");
+                } else if (garden.watering == 0) {
+                    logText.push("NO_WATERING");
+                }
             }
             
             garden.save((err) => {
                 if (!handleError(err, res)) {
+                    logData(garden, uid, null, `GARDEN_CONTROL|${logText.join("|")}`);
+
                     return res.send({
                         ok: true,
                         error: null

@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {LoginService} from '../services/login.service';
 import {Router} from '@angular/router';
 import {DataService} from '../services/data.service';
+import {MessageService} from 'primeng';
 
 @Component({
   selector: 'app-login',
@@ -15,24 +16,32 @@ export class LoginComponent implements OnInit {
 
   constructor(private loginService: LoginService,
               private router: Router,
-              private data: DataService) {
+              private data: DataService,
+              private messageService: MessageService) {
   }
 
   ngOnInit(): void {
-    localStorage.clear();
+    sessionStorage.clear();
   }
 
   onClickLogin() {
     this.loginService.login(this.username, this.password).subscribe(
-      data => {
-        console.log(data);
-        localStorage.setItem('username', this.username);
+      () => {
+        sessionStorage.setItem('username', this.username);
         this.router.navigate(['/garden']);
-        this.data.changeMessage(true);
+        this.data.changeMessage('true');
       },
-      error => {
-        console.log(error);
+      () => {
+        this.showError();
       });
+  }
+
+  private showError() {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Belépés sikertelen',
+      detail: 'Valamilyen hiba lépett fel, vagy a formátum nem megfelelő'
+    });
   }
 
 }

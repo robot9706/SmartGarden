@@ -2,7 +2,7 @@
   <a class="navbar-brand" href="#">Smart Garden</a>
   <div class="collapse navbar-collapse" id="navbarNav">
 
-    <ul class="navbar-nav" *ngIf="!user else authBlock">
+    <ul class="navbar-nav" [hidden]="user">
       <li class="nav-item">
         <a class="nav-link" routerLink="/login">Bejelentkezés</a>
       </li>
@@ -11,14 +11,15 @@
       </li>
     </ul>
 
-    <ng-template #authBlock>
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/garden">A kertem</a>
-        </li>
-      </ul>
-      <button class="btn my-2 my-lg-0 ml-auto" (click)="logout()">Kijelentkezés</button>
-    </ng-template>
+    <ul class="navbar-nav" [hidden]="!user">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/garden">A kertjeim</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/create">Kert létrehozása</a>
+      </li>
+    </ul>
+    <button [hidden]="!user" class="btn my-2 my-lg-0 ml-auto btn btn-link" (click)="logout()">Kijelentkezés</button>
 
   </div>
 </nav>

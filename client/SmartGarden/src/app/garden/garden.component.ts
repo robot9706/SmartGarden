@@ -1,7 +1,9 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import * as _ from 'lodash';
-import {Garden} from '../models/garden.model';
-import {GardenService} from './garden.service';
+import {GardenService} from '../services/garden.service';
+import {SelectItem} from 'primeng';
+import {CellCoordinate} from '../models/garden.model';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-garden',
@@ -9,25 +11,24 @@ import {GardenService} from './garden.service';
   styleUrls: ['./garden.component.css']
 })
 export class GardenComponent implements OnInit {
-
-  garden: Garden[] = [];
-  display = false;
-  clickedIndex;
-  clickedBackground;
-  clickedVegetable;
+  gardens;
+  gardenOptions: SelectItem[] = [];
+  selectedGardenId;
+  garden;
+  cellCoordinate: CellCoordinate[] = [];
+  isCanvasVisible = true;
 
   @ViewChild('canvas', {static: true})
   canvas: ElementRef<HTMLCanvasElement>;
 
   private ctx: CanvasRenderingContext2D;
 
-  constructor(private gardenService: GardenService) {
+  constructor(private gardenService: GardenService,
+              private router: Router) {
   }
 
   ngOnInit(): void {
-    this.initGarden();
-    this.getContext();
-    this.fillWithPictures();
+    this.getGardens();
   }
 
   onClickCanvas(event: any) {
@@ -35,42 +36,74 @@ export class GardenComponent implements OnInit {
     const elem = document.getElementById('canvas');
     const left = event.pageX - elem.offsetLeft + elem.clientLeft;
     const top = event.pageY - elem.offsetTop + elem.clientTop;
-    const field = _.find(this.garden, f => f.x === left - (left % 100) && f.y === top - (top % 100));
-    this.clickedIndex = field.index;
-    this.clickedBackground = field.background;
-    this.clickedVegetable = field.vegetable;
-    this.display = true;
-    console.log(field);
+    const cell = _.find(this.cellCoordinate, c => c.x === left - (left % 100) && c.y === top - (top % 100));
+    console.log(cell);
   }
 
-  private createPicture(x: number, y: number, bg: string, vegetable: string) {
+  onClickCreateGarden() {
+    this.router.navigate(['/create']);
+  }
+
+  private createPicture(x: number, y: number, cell) {
     const img = new Image();
+    const bg = cell.content === 'EMPTY' ? 'empty' : 'plant_bg';
     img.onload = () => {
       this.ctx.drawImage(img, x, y, 100, 100);
       this.ctx.strokeRect(x, y, 100, 100);
     };
     img.src = 'assets/plants/' + bg + '.png';
-
-    if (vegetable) {
-      const img2 = new Image();
-      img2.onload = () => {
-        this.ctx.drawImage(img2, x + 25, y + 25, 50, 50);
-      };
-      img2.src = 'assets/plants/' + vegetable + '.png';
-    }
   }
 
   private getContext() {
     this.ctx = this.canvas.nativeElement.getContext('2d');
   }
 
-  private fillWithPictures() {
-    for (let i = 0; i < 25; i++) {
-      this.createPicture(this.garden[i].x, this.garden[i].y, this.garden[i].background, this.garden[i].vegetable);
+  private fillWithPictures(garden) {
+    let x = 0;
+    let y = 0;
+    for (let i = 0; i < garden.cells.length; i++) {
+      this.createPicture(x, y, garden.cells[i]);
+      this.cellCoordinate[i] = new CellCoordinate();
+      this.cellCoordinate[i].x = x;
+      this.cellCoordinate[i].y = y;
+      this.cellCoordinate[i].index = i;
+      if ((i + 1) % 5 === 0) {
+        y += 100;
+        x = 0;
+      } else {
+        x += 100;
+      }
     }
   }
 
-  private initGarden() {
-    this.garden = this.gardenService.getGarden();
+  getValue(selectedGarden: any) {
+    this.fetchGardenById(selectedGarden);
+  }
+
+  private fetchGardenById(gardenId: string) {
+    this.getContext();
+    this.garden = _.find(this.gardens.own, g => g._id === gardenId);
+    console.log(this.garden);
+    this.fillWithPictures(this.garden);
+  }
+
+  private getGardens() {
+    this.gardenService.getAllGarden().subscribe(
+      garden => {
+        console.log(garden.data);
+        this.gardens = garden.data;
+        const nonEmptyGardenOptions = garden.data.own.map(data => ({
+          label: data.name,
+          value: data._id
+        } as SelectItem));
+        this.gardenOptions = [...nonEmptyGardenOptions];
+        if (_.find(nonEmptyGardenOptions)) {
+          this.fetchGardenById(_.find(nonEmptyGardenOptions).value);
+        } else {
+          this.isCanvasVisible = false;
+          console.log('nefussle');
+        }
+      }
+    );
   }
 }

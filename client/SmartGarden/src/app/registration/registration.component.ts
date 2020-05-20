@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {RegistrationService} from '../services/registration.service';
 import {Router} from '@angular/router';
+import {MessageService} from 'primeng';
 
 @Component({
   selector: 'app-registration',
@@ -13,7 +14,8 @@ export class RegistrationComponent implements OnInit {
   password: string;
 
   constructor(private registrationService: RegistrationService,
-              private router: Router) {
+              private router: Router,
+              private messageService: MessageService) {
   }
 
   ngOnInit(): void {
@@ -21,13 +23,19 @@ export class RegistrationComponent implements OnInit {
 
   onClickRegistration() {
     this.registrationService.registration(this.username, this.password).subscribe(
-      data => {
-        console.log(data);
+      () => {
         this.router.navigate(['/login']);
       },
-      error => {
-        console.log(error);
+      () => {
+        this.showError();
       });
   }
 
+  private showError() {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Mentés sikertelen',
+      detail: 'Valamilyen hiba lépett fel, vagy a formátum nem megfelelő'
+    });
+  }
 }

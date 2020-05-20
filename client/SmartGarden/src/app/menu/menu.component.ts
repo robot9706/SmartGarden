@@ -18,20 +18,22 @@ export class MenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.user = !!localStorage.getItem('username');
-    this.data.currentMessage.subscribe(message => this.user = message);
+    this.user = !!sessionStorage.getItem('username');
+    console.log(this.user);
+    this.data.currentMessage.subscribe(message => {
+      if (message === 'true') {
+        this.user = true;
+      }
+      console.log(this.user);
+    });
   }
 
   logout() {
     this.loginService.logout().subscribe(
-      data => {
-        localStorage.clear();
-        console.log(data);
+      () => {
+        sessionStorage.clear();
         this.router.navigate(['/login']);
         this.user = false;
-      },
-      error => {
-        console.log(error);
       }
     );
   }

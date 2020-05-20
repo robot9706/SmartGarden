@@ -3,8 +3,17 @@ import {NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {GardenComponent} from './garden/garden.component';
-import {GardenService} from './garden/garden.service';
-import {ButtonModule, CalendarModule, DialogModule, MenubarModule, MenuModule} from 'primeng';
+import {
+  ButtonModule,
+  CalendarModule,
+  DialogModule,
+  DropdownModule,
+  MenubarModule,
+  MenuModule,
+  MessageService,
+  MessagesModule,
+  ToastModule
+} from 'primeng';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AppRoutingModule} from './app-routing.module';
 import {RouterModule} from '@angular/router';
@@ -14,6 +23,7 @@ import {RegistrationComponent} from './registration/registration.component';
 import {FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {MenuComponent} from './menu/menu.component';
+import {CreateGardenComponent} from './create-garden/create-garden.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +32,8 @@ import {MenuComponent} from './menu/menu.component';
     LoginComponent,
     ErrorComponent,
     RegistrationComponent,
-    MenuComponent
+    MenuComponent,
+    CreateGardenComponent
   ],
   imports: [
     BrowserModule,
@@ -35,9 +46,12 @@ import {MenuComponent} from './menu/menu.component';
     FormsModule,
     HttpClientModule,
     MenuModule,
-    MenubarModule
+    MenubarModule,
+    DropdownModule,
+    MessagesModule,
+    ToastModule
   ],
-  providers: [GardenService, MenuComponent],
+  providers: [MenuComponent, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

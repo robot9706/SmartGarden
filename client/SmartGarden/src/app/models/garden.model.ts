@@ -1,7 +1,5 @@
-export class Garden {
-  index: number;
+export class CellCoordinate {
   x: number;
   y: number;
-  background: string;
-  vegetable: string;
+  index: number;
 }

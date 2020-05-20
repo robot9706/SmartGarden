@@ -1,7 +1,35 @@
-<div class="container">
-  <canvas #canvas id="canvas" width="500" height="500" (click)="onClickCanvas($event)" style="align: center"></canvas>
+<div [hidden]="!isCanvasVisible" style="width: 100%; text-align:center;">
+  <p-dropdown [options]="gardenOptions" [(ngModel)]="selectedGardenId"
+              (onChange)="getValue(selectedGardenId)">
+  </p-dropdown>
 </div>
-<div>
+<br>
+<div [hidden]="!isCanvasVisible" style="width: 100%; text-align:center;">
+  <canvas style=" display: inline;" #canvas id="canvas" width="500" height="500" (click)="onClickCanvas($event)"
+  ></canvas>
+</div>
+
+<div class="container" [hidden]="isCanvasVisible">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header"><h6 class="text-center">Kert létrehozása</h6></div>
+        <div class="card-body">
+          <div class="row d-flex justify-content-center text-center">
+            <span class="text-center">Jelenleg még nem rendelkezel kerttel, de a lenti gombra kattintva létrehozhatsz egyet.</span>
+          </div>
+          <br>
+          <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary" (click)="onClickCreateGarden()">
+              Létrehozás
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--<div>
   <p-dialog class="dialogClass"
             id="fieldDialog"
             #fieldDialog
@@ -19,5 +47,5 @@
       <button type="button" pButton icon="pi pi-check" label="Mentés"></button>
     </p-footer>
   </p-dialog>
-</div>
+</div>-->
 

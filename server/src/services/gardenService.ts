@@ -79,7 +79,6 @@ const get_all = (req, res) => {
     gardenModel.find({
         owner: uid
     }, (err, ownGardens) => {
-        console.log(ownGardens);
         if (!handleError(err, res)) {
             console.log(uid);
             gardenerModel.find({
@@ -124,12 +123,40 @@ const get_info = (req, res) => {
         _id: gid
     }, (err, garden) =>{
         if (!handleError(err, res)) {
-            gardenerModel.find({
-                garden: gid
-            }, (err, data) => {
+
+            gardenerModel.aggregate([
+                {
+                    $match: 
+                    {
+                        garden: new mongoose.Types.ObjectId(gid)
+                    }
+                },
+                {
+                    $lookup: 
+                    {
+                        from: "users",
+                        localField: "gardener",
+                        foreignField: "_id",
+                        as: "userData"
+                    }
+                },
+                {
+                    $unwind:
+                    {
+                        path: "$userData",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $project: 
+                    {
+                        _id: 0,
+                        gardenerUsername: "$userData.username",
+                        gardenerID: "$userData._id",
+                    }  
+                }
+            ], (err, gardeners) => {
                 if (!handleError(err, res)) {
-                    const gardeners = data.map(x => x.gardener);
-        
                     res.send({
                         ok: true,
                         data: {

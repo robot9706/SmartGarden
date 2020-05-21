@@ -1,7 +1,7 @@
 import passport from "passport";
 import mongoose from "mongoose";
 import { addSecurity, getSessionUserID } from "../security";
-import { gardenModel, gardenerModel } from "../model/model";
+import { gardenModel, gardenerModel, userModel } from "../model/model";
 import { handleError } from "./services";
 import { logData } from "./logService";
 
@@ -18,53 +18,74 @@ const gardenerAdd = (req, res) => {
 
     const uid = getSessionUserID(req);
 
-    gardenModel.findOne({
-        _id: garden,
-        owner: uid
-    }, (error, data) => {
-        if (error || data == null) {
-            console.log(error);
-            return res.send({
-                ok: false,
-                error: "Unknown garden!"
-            });
-        } else {
-            gardenerModel.findOne({
-                garden: garden,
-                gardener: gardener  
+    userModel.findOne({
+        username: gardener
+    }, (error, gardenerUser) => {
+        if (!handleError(error, res)) {
+            if (gardenerUser == null) {
+                return res.send({
+                    ok: false,
+                    error: "Gardener user not found!"
+                });
+            }
+
+            const gardenerID = gardenerUser._id;
+            if (gardenerID == uid) {
+                return res.send({
+                    ok: false,
+                    error: "Invalid gardener user!"
+                });
+            }
+
+            gardenModel.findOne({
+                _id: garden,
+                owner: uid
             }, (error, data) => {
-                if (!handleError(error, res)) {
-                    if (data == null) {
-                        let newGardener = new gardenerModel({
-                            garden: garden,
-                            gardener: gardener
-                        });
-            
-                        newGardener.save((error) => {
-                            if (error) {
-                                console.log(error);
+                if (error || data == null) {
+                    console.log(error);
+                    return res.send({
+                        ok: false,
+                        error: "Unknown garden!"
+                    });
+                } else {
+                    gardenerModel.findOne({
+                        garden: garden,
+                        gardener: gardenerID  
+                    }, (error, data) => {
+                        if (!handleError(error, res)) {
+                            if (data == null) {
+                                let newGardener = new gardenerModel({
+                                    garden: garden,
+                                    gardener: gardenerID
+                                });
+                    
+                                newGardener.save((error) => {
+                                    if (error) {
+                                        console.log(error);
+                                        return res.send({
+                                            ok: false,
+                                            error: error.toString()
+                                        })
+                                    } else {
+        
+                                        logData(garden, uid, gardenerID, "GARDENER_ADDED");
+                                        
+                                        return res.send({
+                                            ok: true,
+                                            error: null
+                                        })
+                                    }
+                                });
+                            } else {
                                 return res.send({
                                     ok: false,
-                                    error: error.toString()
-                                })
-                            } else {
-
-                                logData(garden, uid, gardener, "GARDENER_ADDED");
-                                
-                                return res.send({
-                                    ok: true,
-                                    error: null
+                                    error: "Already added!"
                                 })
                             }
-                        });
-                    } else {
-                        return res.send({
-                            ok: false,
-                            error: "Already added!"
-                        })
-                    }
+                        }
+                    })
                 }
-            })
+            });
         }
     });
 };

@@ -232,6 +232,7 @@ const cell_actions = {
             }
 
             garden.cells[cell_index].content = action_data.content_requested;
+            garden.cells[cell_index].content_requested = null;
             garden.markModified("cells");
     
             garden.save((err) => {

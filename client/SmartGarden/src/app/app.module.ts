@@ -8,10 +8,12 @@ import {
   CalendarModule,
   DialogModule,
   DropdownModule,
+  InputTextModule,
   MenubarModule,
   MenuModule,
   MessageService,
   MessagesModule,
+  SliderModule,
   ToastModule
 } from 'primeng';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -24,7 +26,7 @@ import {FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {MenuComponent} from './menu/menu.component';
 import {CreateGardenComponent} from './create-garden/create-garden.component';
-import { GardenerComponent } from './gardener/gardener.component';
+import {GardenerComponent} from './gardener/gardener.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +53,9 @@ import { GardenerComponent } from './gardener/gardener.component';
     MenubarModule,
     DropdownModule,
     MessagesModule,
-    ToastModule
+    ToastModule,
+    SliderModule,
+    InputTextModule
   ],
   providers: [MenuComponent, MessageService],
   bootstrap: [AppComponent]

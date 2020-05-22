@@ -71,4 +71,8 @@ export class GardenService {
       action_data
     }, this.httpOptions) as Observable<any>;
   }
+
+  gardenControl(garden: any, heating: any, watering: any) {
+    return this.http.post('http://localhost:3000/data/garden_control', {garden, heating, watering}, this.httpOptions) as Observable<any>;
+  }
 }

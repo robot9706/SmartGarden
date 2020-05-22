@@ -27,6 +27,10 @@ export class GardenComponent implements OnInit {
   isOwnCell = true;
   selectedCellGardenId;
   originalContent;
+  gardenHeating;
+  gardenWatering;
+  waterOptions: SelectItem[];
+  heatOptions: SelectItem[];
 
   @ViewChild('canvas', {static: true})
   canvas: ElementRef<HTMLCanvasElement>;
@@ -41,6 +45,8 @@ export class GardenComponent implements OnInit {
   ngOnInit(): void {
     this.getGardens();
     this.initPlantDropdownValues();
+    this.initHeatingOptions();
+    this.initWateringOptions();
   }
 
   private initPlantDropdownValues() {
@@ -52,6 +58,21 @@ export class GardenComponent implements OnInit {
       {label: 'Retek ültetés', value: 'PLANT_RADDISH'},
       {label: 'Cukornád ültetés', value: 'PLANT_SUGAR_CANE'},
       {label: 'Búza ültetés', value: 'PLANT_WHEAT'},
+    ];
+  }
+
+  private initWateringOptions() {
+    this.waterOptions = [
+      {label: 'Öntözés bekapcsolva', value: 1},
+      {label: 'Öntözés kikapcsolva', value: 0},
+    ];
+  }
+
+  private initHeatingOptions() {
+    this.heatOptions = [
+      {label: 'Fűtés bekapcsolva', value: 1},
+      {label: 'Fűtés/hűtés kikapcsolva', value: 0},
+      {label: 'Hűtés bekapcsolva', value: -1}
     ];
   }
 
@@ -154,6 +175,8 @@ export class GardenComponent implements OnInit {
       this.garden = _.find(this.gardens.other, g => g._id === gardenId);
       isOwn = false;
     }
+    this.gardenHeating = this.garden.heating;
+    this.gardenWatering = this.garden.watering;
     this.fillWithPictures(this.garden, isOwn);
   }
 
@@ -171,9 +194,9 @@ export class GardenComponent implements OnInit {
         } as SelectItem));
         this.gardenOptions = [...nonEmptyGardenOptions, ...nonEmptyOtherGardenOptions];
         if (_.find(nonEmptyGardenOptions)) {
-          this.fetchGardenById(_.find(nonEmptyGardenOptions).value);
+          this.fetchGardenById(this.garden ? this.garden._id : _.find(nonEmptyGardenOptions).value);
         } else if (_.find(nonEmptyOtherGardenOptions)) {
-          this.fetchGardenById(_.find(nonEmptyOtherGardenOptions).value);
+          this.fetchGardenById(this.garden ? this.garden._id : _.find(nonEmptyOtherGardenOptions).value);
         } else {
           this.isCanvasVisible = false;
         }
@@ -220,6 +243,16 @@ export class GardenComponent implements OnInit {
     } else {
       return '';
     }
+  }
+
+  onClickGardenControl() {
+    this.gardenService.gardenControl(this.garden._id, this.gardenHeating, this.gardenWatering).subscribe(
+      data => {
+        data.ok === true ? this.showSuccess() : this.showError();
+        this.getGardens();
+        this.selectedGardenId = this.garden._id;
+      }
+    );
   }
 
   private showSuccess() {

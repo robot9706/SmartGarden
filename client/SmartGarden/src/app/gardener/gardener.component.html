@@ -1,0 +1,87 @@
+<p-toast position="top-center"></p-toast>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">Kertész hozzáadása</div>
+        <div class="card-body" [hidden]="!isFieldVisible">
+          <div class="form-group row">
+            <label for="username" class="col-md-4 col-form-label text-md-right ">Kertem kiválasztása:</label>
+            <div class="col-md-6">
+              <p-dropdown #dd [options]="gardenOptions"
+                          [(ngModel)]="selectedGardenId"
+                          styleClass="gardener-dropdown"
+              >
+              </p-dropdown>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="username" class="col-md-4 col-form-label text-md-right">Kertész kiválasztása:</label>
+            <div class="col-md-6">
+              <input id="username" type="text" class="form-control required autofocus" [(ngModel)]="username">
+            </div>
+          </div>
+          <div class="form-group row mb-0">
+            <div class="col-md-8 offset-md-4">
+              <button type="submit" class="btn btn-primary" (click)="onClickAdd(dd)">
+                Hozzáadás
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body" [hidden]="isFieldVisible">
+          <div class="row d-flex justify-content-center text-center">
+            <span class="text-center">Jelenleg még nem rendelkezel kerttel, amihez hozzá tudnál adni kertészt.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<br>
+<br>
+
+<div class="container" [hidden]="!isFieldVisible">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">Kertész eltávolítása</div>
+        <div class="card-body">
+          <div class="form-group row">
+            <label class="col-md-4 col-form-label text-md-right">Kertem kiválasztása:</label>
+            <div class="col-md-6">
+              <p-dropdown #dd2 [options]="gardenOptions"
+                          [(ngModel)]="selectedGardenId2"
+                          (onChange)="getGardenValue(selectedGardenId2)"
+                          styleClass="gardener-dropdown">
+              </p-dropdown>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-4 col-form-label text-md-right">Kertész kiválasztása:</label>
+            <div class="col-md-6">
+              <p-dropdown #dd3 [options]="gardenersOtions"
+                          [(ngModel)]="userId" styleClass="gardener-dropdown"
+              >
+              </p-dropdown>
+            </div>
+          </div>
+          <div class="form-group row mb-0">
+            <div class="col-md-8 offset-md-4">
+              <button type="submit" class="btn btn-primary" (click)="onClickRemove(dd2, dd3)">
+                Eltávolítás
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+

@@ -24,6 +24,7 @@ import {FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {MenuComponent} from './menu/menu.component';
 import {CreateGardenComponent} from './create-garden/create-garden.component';
+import { GardenerComponent } from './gardener/gardener.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import {CreateGardenComponent} from './create-garden/create-garden.component';
     ErrorComponent,
     RegistrationComponent,
     MenuComponent,
-    CreateGardenComponent
+    CreateGardenComponent,
+    GardenerComponent
   ],
   imports: [
     BrowserModule,

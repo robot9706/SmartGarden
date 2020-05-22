@@ -45,13 +45,29 @@ export class GardenComponent implements OnInit {
   }
 
   private createPicture(x: number, y: number, cell) {
-    const img = new Image();
-    const bg = cell.content === 'EMPTY' ? 'empty' : 'plant_bg';
-    img.onload = () => {
-      this.ctx.drawImage(img, x, y, 100, 100);
-      this.ctx.strokeRect(x, y, 100, 100);
-    };
-    img.src = 'assets/plants/' + bg + '.png';
+    let content: string;
+    if (cell.content === 'EMPTY') {
+      content = 'empty';
+      const img = new Image();
+      img.onload = () => {
+        this.ctx.drawImage(img, x, y, 100, 100);
+        this.ctx.strokeRect(x, y, 100, 100);
+      };
+      img.src = 'assets/plants/' + content + '.png';
+    } else {
+      const img = new Image();
+      img.onload = () => {
+        this.ctx.drawImage(img, x, y, 100, 100);
+        this.ctx.strokeRect(x, y, 100, 100);
+      };
+      img.src = 'assets/plants/' + 'plant_bg' + '.png';
+
+      const img2 = new Image();
+      img2.onload = () => {
+        this.ctx.drawImage(img2, x + 25, y + 25, 50, 50);
+      };
+      img2.src = 'assets/plants/' + cell.content.toLowerCase() + '.png';
+    }
   }
 
   private getContext() {
@@ -101,7 +117,6 @@ export class GardenComponent implements OnInit {
           this.fetchGardenById(_.find(nonEmptyGardenOptions).value);
         } else {
           this.isCanvasVisible = false;
-          console.log('nefussle');
         }
       }
     );

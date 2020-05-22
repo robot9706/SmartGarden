@@ -65,7 +65,6 @@ export class GardenerComponent implements OnInit {
   }
 
   private getGardeners(gardenInfos) {
-    console.log(gardenInfos.data);
     const arr1: SelectItem[] = [];
     if (gardenInfos.data === undefined) {
       arr1.push(EMPTY_OPTION);
@@ -77,13 +76,11 @@ export class GardenerComponent implements OnInit {
       });
       this.gardenersOtions = arr1;
     }
-    console.log(this.gardenersOtions);
   }
 
   private getGardens() {
     this.gardenService.getAllGarden().subscribe(
       garden => {
-        console.log(garden.data);
         this.gardens = garden.data;
         const nonEmptyGardenOptions = garden.data.own.map(data => ({
           label: data.name,
@@ -91,7 +88,6 @@ export class GardenerComponent implements OnInit {
         } as SelectItem));
         this.gardenOptions = [EMPTY_OPTION, ...nonEmptyGardenOptions];
         this.isFieldVisible = !!_.find(nonEmptyGardenOptions);
-        console.log(this.gardenOptions);
       }
     );
   }
@@ -109,9 +105,5 @@ export class GardenerComponent implements OnInit {
       summary: 'Mentés sikertelen',
       detail: 'Helytelen vagy hiányzó adat.'
     });
-  }
-
-  change(userId: any) {
-    console.log(userId);
   }
 }

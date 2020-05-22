@@ -3,9 +3,15 @@
 @import '../node_modules/primeng/resources/themes/nova-light/theme.css';
 @import '../node_modules/primeicons/primeicons.css';
 
-/*.ui-dropdown {
-  width: 100% !important;
-}*/
 .gardener-dropdown {
   width: 100%;
+}
+
+
+.ui-dialog {
+  width: 70%;
+}
+
+body .ui-dialog .ui-dialog-content {
+  height: 250px;
 }

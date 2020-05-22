@@ -21,8 +21,6 @@ export class GardenerService {
   }
 
   removeGardener(garden: string, gardener: string): Observable<any> {
-    console.log(garden);
-    console.log(gardener);
     const httpOptions = {
       withCredentials: true,
       headers: new HttpHeaders({

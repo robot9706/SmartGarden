@@ -19,12 +19,10 @@ export class MenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.user = !!sessionStorage.getItem('username');
-    console.log(this.user);
     this.data.currentMessage.subscribe(message => {
       if (message === 'true') {
         this.user = true;
       }
-      console.log(this.user);
     });
   }
 

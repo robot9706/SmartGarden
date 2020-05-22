@@ -1,3 +1,4 @@
+<p-toast position="top-center"></p-toast>
 <div [hidden]="!isCanvasVisible" style="width: 100%; text-align:center;">
   <p-dropdown [options]="gardenOptions" [(ngModel)]="selectedGardenId"
               (onChange)="getValue(selectedGardenId)">
@@ -29,7 +30,7 @@
     </div>
   </div>
 </div>
-<!--<div>
+<div>
   <p-dialog class="dialogClass"
             id="fieldDialog"
             #fieldDialog
@@ -38,14 +39,65 @@
             [showHeader]="true"
             [closable]="true"
             [modal]="true"
+            [resizable]="true"
             [appendTo]="'body'"
             [baseZIndex]="10000"
             [draggable]="false">
-    <span>{{clickedBackground}}</span>
-    <span>{{clickedVegetable}}</span>
+    <div [hidden]="!isOwnCell" class="row">
+      <div class="col-md-4">
+        <h5>Cella index:</h5>
+      </div>
+      <div class="col-md-2">
+        <h5>{{this.index}}</h5>
+      </div>
+    </div>
+
+    <div [hidden]="!isOwnCell" class="row">
+      <div class="col-md-4">
+        <h5>Cella hőmérséklet:</h5>
+      </div>
+      <div class="col-md-2">
+        <h5>{{this.temperature}}</h5>
+      </div>
+    </div>
+
+    <div [hidden]="!isOwnCell" class="row">
+      <div class="col-md-4">
+        <h5>Cella páratartalom:</h5>
+      </div>
+      <div class="col-md-2">
+        <h5>{{this.humidity}}</h5>
+      </div>
+    </div>
+
+    <div [hidden]="!isOwnCell" class="row">
+      <div class="col-md-4">
+        <h5>Cella növény:</h5>
+      </div>
+      <div class="col-md-2">
+        <p-dropdown [options]="plantOptions" [(ngModel)]="this.content">
+        </p-dropdown>
+      </div>
+    </div>
+
+    <div [hidden]="!this.request" class="row">
+      <div class="col-md-4">
+        <h5>Korábbi kérésed:</h5>
+      </div>
+      <div class="col-md-3">
+        <h5>{{getRequetText(this.request)}}</h5>
+      </div>
+    </div>
+
+    <div class="row d-flex justify-content-center text-center">
+      <span [hidden]="!(!this.request && !isOwnCell)" class="text-center">Az adott cellára nem kaptál kérést változtatással kapcsolatban.</span>
+    </div>
+
     <p-footer>
-      <button type="button" pButton icon="pi pi-check" label="Mentés"></button>
+      <button [hidden]="!this.request && !isOwnCell" type="button" pButton icon="pi pi-check"
+              [label]="isOwnCell ? 'Mentés' : 'Ültetés'"
+              (click)="onClickSave()"></button>
     </p-footer>
   </p-dialog>
-</div>-->
+</div>
 

@@ -37,6 +37,10 @@ const isOwner = (gardenID, userID) => {
     });
 }
 
+const randomInt = (max) => {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
 const create = (req, res) => {
     const data = req.body;
     const { name } = data;
@@ -80,7 +84,6 @@ const get_all = (req, res) => {
         owner: uid
     }, (err, ownGardens) => {
         if (!handleError(err, res)) {
-            console.log(uid);
             gardenerModel.find({
                 gardener: uid
             }, (err, gardening) => {
@@ -156,15 +159,16 @@ const get_info = (req, res) => {
                     }  
                 }
             ], (err, gardeners) => {
-                if (!handleError(err, res)) {
+                if (!handleError(err, res)) {         
                     res.send({
                         ok: true,
                         data: {
                             gardeners: gardeners,
-                            temperature: 20,
-                            humidity: 50,
                             heating: garden.heating,
-                            watering: garden.watering
+                            watering: garden.watering,
+                            // Valós adatok "emulálása"
+                            temperature: (garden.heating ? 25 : 15) + (randomInt(10) - 5),
+                            humidity: (40 + garden.watering * 15) + (randomInt(10) - 5)
                         }
                     });
                 }
@@ -204,6 +208,12 @@ const cell_info = async (req, res) => {
         _id: gid
     }, (err, data) => {
         if (!handleError(err, res)) {
+            // Valós adatok "emulálása"
+            for (var i = 0; i < data.cells.length; i++) {
+                data.cells[i].temperature = (20 + data.heating * 8) + (randomInt(10) - 5);
+                data.cells[i].humidity = (data.watering ? 60 : 40) + (randomInt(10) - 5);
+            }
+
             res.status(200).send({
                 ok: true,
                 data: {

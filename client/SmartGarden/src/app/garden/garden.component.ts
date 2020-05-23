@@ -124,6 +124,16 @@ export class GardenComponent implements OnInit {
         this.ctx.strokeRect(x, y, 100, 100);
       };
       img.src = 'assets/plants/' + content + '.png';
+
+      if (cell.content_requested != null) {
+        setTimeout(() => {
+          const img2 = new Image();
+          img2.onload = () => {
+            this.ctx.drawImage(img2, x + 25, y + 25, 50, 50);
+          };
+          img2.src = 'assets/plants/new.png';
+        }, 500);
+      }
     } else {
       const img = new Image();
       img.onload = () => {

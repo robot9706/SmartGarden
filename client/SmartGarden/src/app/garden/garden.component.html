@@ -85,47 +85,48 @@
             [baseZIndex]="10000"
             [draggable]="false">
     <div [hidden]="!isOwnCell" class="row">
-      <div class="col-md-4">
+      <div class="col-md-5">
         <h5>Cella index:</h5>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-5">
         <h5>{{this.index}}</h5>
       </div>
     </div>
 
     <div [hidden]="!isOwnCell" class="row">
-      <div class="col-md-4">
+      <div class="col-md-5">
         <h5>Cella hőmérséklet:</h5>
       </div>
-      <div class="col-md-2">
-        <h5>{{this.temperature}}</h5>
+      <div class="col-md-5">
+        <h5>{{this.temperature}} celsius fok</h5>
       </div>
     </div>
 
     <div [hidden]="!isOwnCell" class="row">
-      <div class="col-md-4">
+      <div class="col-md-5">
         <h5>Cella páratartalom:</h5>
       </div>
-      <div class="col-md-2">
-        <h5>{{this.humidity}}</h5>
+      <div class="col-md-5">
+        <h5>{{this.humidity}} százalék</h5>
       </div>
     </div>
 
     <div [hidden]="!isOwnCell" class="row">
-      <div class="col-md-4">
+      <div class="col-md-5">
         <h5>Cella növény:</h5>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-5">
         <p-dropdown [options]="plantOptions" [(ngModel)]="this.content">
         </p-dropdown>
+        <i class="pi pi-info" (click)="getPlantInfo(this.content)"></i>
       </div>
     </div>
 
     <div [hidden]="!this.request" class="row">
-      <div class="col-md-4">
+      <div class="col-md-5">
         <h5>Korábbi kérésed:</h5>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-5">
         <h5>{{getRequetText(this.request)}}</h5>
       </div>
     </div>
@@ -139,6 +140,59 @@
               [label]="isOwnCell ? 'Mentés' : 'Ültetés'"
               (click)="onClickSave()"></button>
     </p-footer>
+  </p-dialog>
+
+
+  <p-dialog class="dialogClass"
+            id="plantDialog"
+            #plantDialog
+            [(visible)]="plantInfo"
+            [header]="'Növény információ'"
+            [showHeader]="true"
+            [closable]="true"
+            [modal]="true"
+            [resizable]="true"
+            [appendTo]="'body'"
+            [baseZIndex]="10001"
+            [draggable]="false">
+
+
+    <div class="row">
+      <div class="col-md-5">
+        <h5>Növény neve:</h5>
+      </div>
+      <div class="col-md-5">
+        <h5>{{this.plantName}}</h5>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-5">
+        <h5>Növény kedvelt hőmérséklete:</h5>
+      </div>
+      <div class="col-md-5">
+        <h5>{{this.plantRequiredTemperature[0]}} - {{this.plantRequiredTemperature[1]}} celsius fok</h5>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-5">
+        <h5>Növény kedvelt páratartalma:</h5>
+      </div>
+      <div class="col-md-5">
+        <h5>{{this.plantRequiredHumidity[0]}} - {{this.plantRequiredHumidity[1]}} százalék</h5>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-5">
+        <h5>Szükséges öntözés per nap:</h5>
+      </div>
+      <div class="col-md-5">
+        <h5>{{this.plantWaterPerDay}}</h5>
+      </div>
+    </div>
+
   </p-dialog>
 </div>
 

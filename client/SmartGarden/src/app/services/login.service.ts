@@ -10,18 +10,20 @@ export class LoginService {
   constructor(private http: HttpClient) {
   }
 
-  httpOptions = {
-    withCredentials: true,
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json'
-    })
-  };
-
   login(username: string, password: string): Observable<any> {
-    return this.http.post('http://localhost:3000/data/login', {username, password}, this.httpOptions);
+    const httpOptions = {
+      withCredentials: true,
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    };
+    return this.http.post('http://localhost:3000/data/login', {username, password}, httpOptions);
   }
 
   logout(): Observable<any> {
-    return this.http.get('http://localhost:3000/data/logout', this.httpOptions);
+    const httpOptions = {
+      withCredentials: true
+    };
+    return this.http.get('http://localhost:3000/data/logout', httpOptions);
   }
 }

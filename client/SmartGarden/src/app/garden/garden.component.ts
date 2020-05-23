@@ -31,6 +31,11 @@ export class GardenComponent implements OnInit {
   gardenWatering;
   waterOptions: SelectItem[];
   heatOptions: SelectItem[];
+  plantInfo = false;
+  plantName;
+  plantRequiredHumidity = [];
+  plantRequiredTemperature = [];
+  plantWaterPerDay;
 
   @ViewChild('canvas', {static: true})
   canvas: ElementRef<HTMLCanvasElement>;
@@ -255,8 +260,33 @@ export class GardenComponent implements OnInit {
     );
   }
 
+  getPlantInfo(content: any) {
+    this.gardenService.getPlantInfo(content).subscribe(plant => {
+      if (plant.ok) {
+        const plantInfo = _.get(plant.data, content);
+        if (plantInfo) {
+          this.plantName = plantInfo.name;
+          this.plantRequiredHumidity = plantInfo.requiredHumidity;
+          this.plantRequiredTemperature = plantInfo.requiredTemperature;
+          this.plantWaterPerDay = plantInfo.waterPerDay;
+          this.plantInfo = true;
+        } else {
+          this.showInfo();
+        }
+      }
+    });
+  }
+
   private showSuccess() {
     this.messageService.add({severity: 'success', summary: 'Mentés sikeres', detail: 'A Művelet sikeresen végbement.'});
+  }
+
+  private showInfo() {
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Nincs információ',
+      detail: 'Az adott növényhez még nem áll rendelkezésre információ.'
+    });
   }
 
   private showError() {

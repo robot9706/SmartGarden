@@ -1,0 +1,70 @@
+<div [hidden]="!isLogsVisible" style="width: 100%; text-align:center;">
+  <p-dropdown styleClass="gardener-dropdown-45" [options]="gardenOptions" [(ngModel)]="selectedGarden"
+              (onChange)="getValue(selectedGarden)">
+  </p-dropdown>
+</div>
+<br>
+
+<div *ngFor="let log of logs" class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="row">
+            <div class="col-md-4">
+              <span>Esemény dátuma:</span>
+            </div>
+            <div class="col-md-6">
+              <span>{{getMoment(log.date)}}</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <span>Esemény:</span>
+            </div>
+            <div class="col-md-6">
+              <span>{{log.event}}</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <span>Esemény végrehajtója:</span>
+            </div>
+            <div class="col-md-6">
+              <span>{{log.performedBy}}</span>
+            </div>
+          </div>
+
+          <div class="row" [hidden]="!log.performedOn">
+            <div class="col-md-4">
+              <span>Esemény kin lett végrehajtva:</span>
+            </div>
+            <div class="col-md-6">
+              <span>{{log.performedOn}}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+</div>
+
+<div class="container" [hidden]="isLogsVisible">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">Nincs eseményed még.</div>
+        <div class="card-body">
+          <div class="row d-flex justify-content-center text-center">
+            <span class="text-center">Jelenleg még nem rendelkezel eseménnyel, amit meg lehetne jeleníteni.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

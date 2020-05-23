@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">Smart Garden</a>
+  <a class="navbar-brand" routerLink="/garden">Smart Garden</a>
   <div class="collapse navbar-collapse" id="navbarNav">
 
     <ul class="navbar-nav" [hidden]="user">
@@ -20,6 +20,9 @@
       </li>
       <li class="nav-item">
         <a class="nav-link" routerLink="/gardener">Kertészek kezelése</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/logs">Kertjeim eseményei</a>
       </li>
     </ul>
     <button [hidden]="!user" class="btn my-2 my-lg-0 ml-auto btn btn-link" (click)="logout()">Kijelentkezés</button>

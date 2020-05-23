@@ -75,4 +75,15 @@ export class GardenService {
   gardenControl(garden: any, heating: any, watering: any) {
     return this.http.post('http://localhost:3000/data/garden_control', {garden, heating, watering}, this.httpOptions) as Observable<any>;
   }
+
+  getLogs(garden: string) {
+    const httpOptions = {
+      params: {garden},
+      withCredentials: true,
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    };
+    return this.http.get('http://localhost:3000/data/log', httpOptions) as Observable<any>;
+  }
 }

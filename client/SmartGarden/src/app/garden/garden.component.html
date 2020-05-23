@@ -1,7 +1,7 @@
 <p-toast position="top-center"></p-toast>
 <div [hidden]="!isCanvasVisible" style="width: 100%; text-align:center;">
   <p-dropdown [options]="gardenOptions" [(ngModel)]="selectedGardenId"
-              (onChange)="getValue(selectedGardenId)">
+              (onChange)="getValue(selectedGardenId)" styleClass="gardener-dropdown-30">
   </p-dropdown>
 </div>
 
